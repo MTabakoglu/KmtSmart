@@ -1,0 +1,120 @@
+﻿@page "/workorders/add/{deviceid:int}"
+@inject NavigationManager navman
+@inject IWorkOrderService _workOrderService
+
+
+<h3>WorkOrderAdd</h3>
+
+<div class="row">
+    <form class="col-sm-10">
+        <div class="clearfix">
+            <div class="form-group float-left col-sm-4">
+                <label for="worderName">Work Order Name</label>
+                <input type="text" class="form-control d-block" id="worderName" @bind="workordername">
+            </div>
+            <div class="form-group float-left col-sm-4">
+                <button type="button" class="btn btn-primary px-5" @onclick="AddRow"><span class="oi oi-plus px-2"></span>Add Row</button>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-auto text-center">
+                <label f>#</label>
+            </div>
+            <div class="col text-center">
+                <label>Cutting Lenght</label>
+            </div>
+            <div class="col text-center">
+                <label>Total Piece</label>
+            </div>
+            <div class="col text-center">
+                <label>Packet</label>
+            </div>
+            <div class="col text-center">
+                <label>Cycle</label>
+            </div>
+            <div class="col text-center">
+                <label>Speed</label>
+            </div>
+            <div class="col text-center">
+                <label>Remove Row</label>
+            </div>
+        </div>
+        @if (cuttings != null)
+        {
+            ListId = 0;
+            for (int i = 0; i < cuttings.Count; i++)
+            {
+                ListId++;
+                var local = i;
+                <div class="row">
+                    <div class="col-auto text-center mb-1">
+                        <label>@ListId</label>
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="CuttingLenght" placeholder="23,45" @bind="cuttings[local].CuttingLenght">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="TotalPiece" placeholder="100" @bind="cuttings[local].TotalPiece">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="Packet" placeholder="20" @bind="cuttings[local].Packet">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="Cycle" placeholder="20" @bind="cuttings[local].Cycle">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="Speed" placeholder="20" @bind="cuttings[local].Speed">
+                    </div>
+                    <div class="col-auto mb-1">
+                        <button class="btn btn-danger btn-sm" type="button" @onclick="@(() => RemoveRow(cuttings[local]))">Remove</button>
+                    </div>
+                </div>
+            }
+
+        }
+        <button type="submit" class="btn btn-primary px-5" @onclick="Save">Save</button>
+    </form>
+</div>
+
+
+@code {
+    [Parameter]
+    public int deviceId { get; set; }
+
+    int ListId = 0;
+
+    string workordername;
+
+    List<Cutting> cuttings = new List<Cutting>();
+
+    private void AddRow()
+    {
+        cuttings.Add(new Cutting());
+    }
+
+    private void RemoveRow(Cutting cutting)
+    {
+        cuttings.RemoveAt(cuttings.IndexOf(cutting));
+    }
+
+    private async Task Save()
+    {
+
+        WorkOrderModel workorder = new WorkOrderModel
+        {
+            WorkOrderName = workordername,
+            DeviceId = deviceId,
+            AddedDateTime = DateTime.Now,
+            Status = "Bekliyor...",
+            CuttingList = cuttings
+        };
+
+        await _workOrderService.Add(workorder);
+        Task.Delay(2000);
+        string link = string.Format("workorders/{0}", deviceId);
+        navman.NavigateTo(link,true);
+
+    }
+}
+

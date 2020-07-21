@@ -1,0 +1,92 @@
+﻿@*@page "/"*@
+@page "/register"
+@layout LoginLayout
+@inject IAuthService  AuthService
+@inject NavigationManager navman 
+
+<div class="card shadow-lg col-sm-7 col-md-5 col-xl-3 m-auto rounded-lg px-0 registercard">
+    <div class="card-header px-4 py-3 text-center">
+        <a href="../../index2.html"><b>KMT</b>smart</a>
+    </div>
+
+    <div class="card-body pb-3">
+        <p class="login-box-msg">Register a new membership</p>
+
+        <EditForm Model="@registerModel" OnValidSubmit="@HandleLogin">
+            <div class="input-group mb-3">
+                <InputText class="form-control" Placeholder="First Name" @bind-Value="@registerModel.FirstName" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fa fa-user"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <InputText class="form-control" Placeholder="Last Name" @bind-Value="@registerModel.LastName" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fa fa-user"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <InputText class="form-control" Placeholder="Email" @bind-Value="@registerModel.Email" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fa fa-envelope"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <InputText type="password" class="form-control" Placeholder="Password" @bind-Value="@registerModel.Password" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fa fa-key"></span>
+                    </div>
+                </div>
+            </div> 
+            <div class="input-group mb-3">
+                <InputText type="password" class="form-control" Placeholder="Password-Repeat" @bind-Value="@repeatPass" />
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fa fa-key"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row clearfix">
+                <div class="col-sm-8 float-left">
+                    <div class="checkbox icheck">
+                        <label>
+                            <input type="checkbox"> I agree to the <a href="#">terms</a>
+                        </label>
+                    </div>
+                </div>
+                <!-- /.col -->
+                <div class="col-sm-4 float-right">
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">Register</button>
+                </div>
+                <!-- /.col -->
+            </div>
+        </EditForm>
+
+        <button type="button" class="btn btn-link " @onclick="login"><i class="fa fa-sign-in-alt pr-3"></i>I already have a membership</button>
+    </div>
+    <!-- /.form-box -->
+</div>
+<!-- /.register-box -->
+@code {
+    RegisterModel registerModel = new RegisterModel();
+
+    string repeatPass;
+
+    private async Task HandleLogin()
+    {
+        var result = await AuthService.Register(registerModel);
+        if (result) navman.NavigateTo("login");
+    }
+
+    private void login()
+    {
+        navman.NavigateTo("login");
+    }
+}

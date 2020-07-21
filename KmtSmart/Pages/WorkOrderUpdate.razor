@@ -1,0 +1,112 @@
+﻿@page "/workorders/update/{worderid:int}"
+@inject NavigationManager navman
+@inject IWorkOrderService _workOrderService
+
+
+<h3>WorkOrderAdd</h3>
+
+<div class="row">
+    <form class="col-sm-10">
+        <div class="clearfix">
+            <div class="form-group float-left col-sm-4">
+                <label for="worderName">Work Order Name</label>
+                <input type="text" class="form-control d-block" id="worderName" @bind="workorder.WorkOrderName">
+            </div>
+            <div class="form-group float-left col-sm-4">
+                <button type="button" class="btn btn-primary px-5" @onclick="AddRow"><span class="oi oi-plus px-2"></span>Add Row</button>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-auto text-center">
+                <label f>#</label>
+            </div>
+            <div class="col text-center">
+                <label>Cutting Lenght</label>
+            </div>
+            <div class="col text-center">
+                <label>Total Piece</label>
+            </div>
+            <div class="col text-center">
+                <label>Packet</label>
+            </div>
+            <div class="col text-center">
+                <label>Cycle</label>
+            </div>
+            <div class="col text-center">
+                <label>Speed</label>
+            </div>
+            <div class="col text-center">
+                <label>Remove Row</label>
+            </div>
+        </div>
+        @if (workorder.CuttingList != null)
+        {
+            ListId = 0;
+            for (int i = 0; i < workorder.CuttingList.Count; i++)
+            {
+                ListId++;
+                var local = i;
+                <div class="row">
+                    <div class="col-auto text-center mb-1">
+                        <label>@ListId</label>
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="CuttingLenght" placeholder="23,45" @bind="workorder.CuttingList[local].CuttingLenght">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="TotalPiece" placeholder="100" @bind="workorder.CuttingList[local].TotalPiece">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="Packet" placeholder="20" @bind="workorder.CuttingList[local].Packet">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="Cycle" placeholder="20" @bind="workorder.CuttingList[local].Cycle">
+                    </div>
+                    <div class="col mb-1">
+                        <input type="text" class="form-control text-center" id="Speed" placeholder="20" @bind="workorder.CuttingList[local].Speed">
+                    </div>
+                    <div class="col-auto mb-1">
+                        <button class="btn btn-danger btn-sm" type="button" @onclick="@(() => RemoveRow(workorder.CuttingList[local]))">Remove</button>
+                    </div>
+                </div>
+            }
+
+        }
+        <button type="submit" class="btn btn-primary px-5" @onclick="Save">Save</button>
+    </form>
+</div>
+
+
+@code {
+    [Parameter]
+    public int worderid { get; set; }
+
+    int ListId = 0;
+
+    WorkOrderModel workorder = new WorkOrderModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        workorder = await _workOrderService.GetById(worderid);
+    }
+
+    private void AddRow()
+    {
+        workorder.CuttingList.Add(new Cutting());
+    }
+
+    private void RemoveRow(Cutting cutting)
+    {
+        workorder.CuttingList.Remove(cutting);
+    }
+
+    private async Task Save()
+    {
+        await _workOrderService.Update(workorder);
+        string link = string.Format("workorders/{0}", workorder.DeviceId);
+        navman.NavigateTo(link);
+
+    }
+}
+

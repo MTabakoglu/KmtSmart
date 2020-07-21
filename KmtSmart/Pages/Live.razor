@@ -1,0 +1,240 @@
+﻿@page "/live/{id:int}"
+@using System.Timers
+@inject ILiveDataService liveDataService
+@inject BlazorTimer Timer
+@implements IDisposable
+
+@if (liveData == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    if (liveData.CuttingData != null)
+    {
+        <div class="content">
+            <div class="row px-2">
+                <div class="card col-sm-3 bg-success mb-2 text-center p-2">
+                    <h6>Cutting Aktive</h6>
+                </div>
+
+                <div class="card col-sm-3 bg-warning mb-2 mx-2 p-2">
+                    <div class="clearfix">
+                        <h6 class="float-left">Cutting Type  </h6>
+                        <h6><span class="badge badge-dark float-right p-2">@liveData.CuttingData.CuttingType</span></h6>
+                    </div>
+                </div>
+                <div class="card col bg-warning mb-2 p-2">
+                    <div class="clearfix">
+                        <h6 class="float-left">Final Data</h6>
+                        <h6><span class="badge badge-dark float-right p-2">@liveData.TimeToAdd</span></h6>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col mb-3 mx-2 p-0">
+                    <div class="card text-white bg-warning" style="min-width: 18rem;">
+                        <div class="card-body">
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">Cutting Set</h6>
+                                <h4> <span class="badge badge-secondary float-right p-2">@liveData.CuttingData.CuttingSet</span></h4>
+                            </div>
+                            <div class="clearfix">
+                                <h6 class="card-title float-left ">
+                                    Cutting Real
+                                </h6>
+                                <h4><span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.CuttingReal</span></h4>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">Cutting Weight</div>
+                    </div>
+                </div>
+
+                <div class="col mb-3 mx-2 p-0">
+                    <div class="card text-white bg-success" style="min-width: 18rem;">
+                        <div class="card-body">
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">Upper Limit</h6>
+                                <h4> <span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.CuttingSet</span></h4>
+                            </div>
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">
+                                    Body Position
+                                </h6>
+                                <h4><span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.BodyPosition</span></h4>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">Body</div>
+                    </div>
+                </div>
+
+                <div class="col mb-3 mx-2 p-0">
+                    <div class="card text-white bg-primary" style="min-width: 18rem;">
+                        <div class="card-body">
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">Servo Speed</h6>
+                                <h4> <span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.ServoSpeed</span></h4>
+                            </div>
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">
+                                    Blade Speed
+                                </h6>
+                                <h4><span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.BladeSpeed</span></h4>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">Cutting Parameters</div>
+                    </div>
+                </div>
+
+                <div class="col mb-3 mx-2 p-0">
+                    <div class="card text-white bg-info" style="min-width: 18rem;">
+                        <div class="card-body">
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">Front Vise Position</h6>
+                                <h4> <span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.FrontPosition</span></h4>
+                            </div>
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">
+                                    Rear Vise Pozition
+                                </h6>
+                                <h4><span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.RearPosition</span></h4>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">Vise Positions</div>
+                    </div>
+                </div>
+
+                <div class="col mb-3 mx-2 p-0">
+                    <div class="card text-white bg-info" style="min-width: 18rem;">
+                        <div class="card-body">
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">Main Engine Power</h6>
+                                <h4> <span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.MainMotorPower</span></h4>
+                            </div>
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">
+                                    Serwo Engine Power
+                                </h6>
+                                <h4><span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.CuttingReal</span></h4>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">Engine Powers</div>
+                    </div>
+                </div>
+
+                <div class="col mb-3 mx-2 p-0">
+                    <div class="card text-white bg-danger" style="min-width: 18rem;">
+                        <div class="card-body">
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">current Line</h6>
+                                <h4> <span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.AmountCutting</span></h4>
+                            </div>
+                            <div class="clearfix">
+                                <h6 class="card-title float-left">
+                                    Total Line
+                                </h6>
+                                <h4><span class="badge badge-secondary float-right  px-3">@liveData.CuttingData.QuantityAll</span></h4>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">Work Order</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="card text-white bg-dark p-2 w-100 mx-2">
+
+                    <div class="progress" style="height: 3px;">
+                        <div class="progress-bar" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">%@CompletionRate</div>
+                    </div>
+                    <div class="row py-2">
+                        <div class="col">
+                            <div style="max-width:30rem;" class="clearfix mr-2">
+                                <h6 class="float-left">Elapsed Time</h6>
+                                <h4><span class="badge badge-secondary float-right">@liveData.CuttingData.ElapsedTime</span></h4>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div style="max-width:30rem;" class="clearfix ">
+                                <h6 class="float-left">Remeaning Time</h6>
+                                <h4><span class="badge badge-secondary float-right">@liveData.CuttingData.RemainingTime</span></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        Time
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    { <h3> Aktif kesim yapılmıyor.</h3>
+
+        <div class="content">
+            <div class="row px-2">
+                <div class="card col-sm-3 bg-success mb-2 text-center p-2">
+                    <h6>Cutting Passive</h6>
+                </div>
+
+                <div class="card col-sm-3 bg-warning mb-2 mx-2 p-2">
+                    <div class="clearfix">
+                        <h6 class="float-left">Cutting Type  </h6>
+                        <h6><span class="badge badge-dark float-right p-2">---</span></h6>
+                    </div>
+                </div>
+                <div class="card col bg-warning mb-2 p-2">
+                    <div class="clearfix">
+                        <h6 class="float-left">Final Data</h6>
+                        <h6><span class="badge badge-dark float-right p-2">@liveData.TimeToAdd</span></h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string CompletionRate { get; set; } = "0";
+    LiveDataModel liveData;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            liveData = await liveDataService.GetLastData(Id);
+            SetCompletionRate();
+            StartTimer();
+        }
+    }
+
+    private void StartTimer()
+    {
+        Timer.SetTimer(1000);
+        Timer.OnElapsed += TimerElapsedHandler;
+        Console.WriteLine("Timer Started.");
+    }
+
+    private async void TimerElapsedHandler()
+    {
+        liveData = await liveDataService.GetLastData(Id);
+        StateHasChanged();
+        Console.WriteLine("Timer Ticked.");
+    }
+
+    private void SetCompletionRate()
+    {
+        if (liveData.CuttingData != null) if ((liveData.CuttingData.ElapsedTime + liveData.CuttingData.RemainingTime) == 0) CompletionRate = "0"; else CompletionRate = Convert.ToInt32(liveData.CuttingData.ElapsedTime * 100 / (liveData.CuttingData.ElapsedTime + liveData.CuttingData.RemainingTime)).ToString();
+    }
+
+    public void Dispose()
+    {
+        Timer.Dispose();
+    }
+}

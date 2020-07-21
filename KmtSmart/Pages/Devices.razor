@@ -1,0 +1,155 @@
+﻿@page "/devices"
+@inject IDeviceService _deviceService
+@inject NavigationManager _navMan
+@inject AuthenticationStateProvider authProvider 
+
+@if (devices == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+
+    <AuthorizeView>
+        <Authorized>
+            <h1>Welcome, @context.User.Identity.Name - Operatör</h1>
+        </Authorized>
+        <NotAuthorized>
+            <h1>Not Authorize</h1>
+            satıcı değil
+
+
+           
+        </NotAuthorized>
+    </AuthorizeView>
+
+
+    <div class="card">
+        <div class="card-header clearfix">
+            <h3 class="ml-3  float-left ">Devices</h3>
+            <button class="btn btn-primary float-right" @onclick="ToggleView"><span class="@textStyleIcon"></span></button>
+        </div>
+
+        @if (CardView)
+        {
+            <div class="row px-2">
+                @foreach (var device in devices)
+                {
+                    <div class="col-sm-3 pb-2">
+                        <div class="card bg-warning m-2 text-center">
+                            <div class="card-header">
+                                @device.Name
+                            </div>
+                            <div class="card-body text-center">
+                                <p>Device Type : @device.TypeId</p>
+                                Aktivation State :
+                                <button class="btn btn-sm btn-outline-dark px-3" @onclick="@(()=>ToggleActivate(device.Id))"> @IsActive(device)</button>
+                            </div>
+                            <div class="card-footer text-left pb-0">
+                                <p class="small text-muted">Added Date : @device.TimeToAdd</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="card-body px-0 py-0">
+                <table class="table p-0 m-0 table-striped table-hover ">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Device Type</th>
+                            <th scope="col">Device Name</th>
+                            <th scope="col">Time To Add</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var device in devices)
+                        {
+                            <tr>
+                                <th scope="row">@listId</th>
+                                <td>@device.TypeId</td>
+                                <td>@device.Name</td>
+                                <td>@device.TimeToAdd</td>
+                                <td><button class="btn btn-sm @IsActiveClassName(device)" @onclick="@(()=>ToggleActivate(device.Id))">@IsActive(device)</button></td>
+                                <td><button class="btn btn-primary btn-sm" @onclick="@(() => GoToDetail(device.Id))">Detail</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        <div class="card-footer text-muted pb-0">
+            <p> @devices.Count() device listed...</p>
+        </div>
+    </div>
+}
+
+
+@code {
+
+    DeviceModel[] devices;
+
+    int listId = 1;
+    public bool CardView { get; set; } = false;
+
+    string textStyleIcon = "oi oi-list-rich";
+
+    protected async override Task OnInitializedAsync()
+    {
+       
+        listId = 1;
+
+        var UserId = 1;
+        devices = await _deviceService.GetDevicesByUser(UserId);
+    }
+
+    void GoToDetail(int DeviceId)
+    {
+        _navMan.NavigateTo("/live/" + DeviceId);
+    }
+
+    void ToggleView()
+    {
+        if (CardView)
+        {
+            CardView = false;
+            textStyleIcon = "oi oi-list-rich";
+        }
+        else
+        {
+            CardView = true;
+            textStyleIcon = "oi oi-list";
+        }
+    }
+
+    async void ToggleActivate(int DeviceId)
+    {
+        DeviceModel device = null;
+
+        foreach (var dv in devices)
+        {
+            if (dv.Id == DeviceId) device = dv;
+        }
+
+        if (device.Status) device.Status = false; else device.Status = true;
+
+        await _deviceService.Update(device);
+    }
+
+    private string IsActive(DeviceModel device)
+    {
+        listId++;
+        if (device.Status) return "Active"; else return "Passive";
+    }
+
+    private string IsActiveClassName(DeviceModel device)
+    {
+        if (device.Status) return "btn-success"; else return "btn-danger";
+    }
+
+}

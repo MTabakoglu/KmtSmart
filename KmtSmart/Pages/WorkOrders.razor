@@ -1,0 +1,161 @@
+﻿@page "/workorders/{id:int}"
+@using System.Timers
+@inject NavigationManager navman
+@inject IWorkOrderService _workOrderService
+
+@if (workorders == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header clearfix">
+            <div class="m-0 p-0 ml-3 float-left">
+                <h3>WorkOrders</h3>
+                <p> The registered job list for the device was not found. Click the button to add. </p>
+            </div>
+            <button class="btn btn-primary float-right" @onclick="NavigateWorkOrderAdd">Insert workorder</button>
+        </div>
+
+        <div class="card-body px-0 py-0">
+            <div class="row">
+                <div class="col-sm">
+                    <table class="table p-0 m-0 table-striped table-hover ">
+
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Work Orders Name</th>
+                                <th scope="col">Row Count</th>
+                                <th scope="col">Time To Add</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Modify</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                listId = 0;
+                                foreach (var workOrder in workorders)
+                                {
+                                    WorderlistId++;
+                                    <tr @onclick="@(() => SelectWorkOrder(workOrder.WorkOrderId))">
+                                        <th scope="row">@WorderlistId</th>
+                                        <td>@workOrder.WorkOrderName</td>
+                                        <td>
+
+                                            @if (workOrder.CuttingList != null)
+                                            {
+                                                workOrder.CuttingList.Count();
+                                            }
+                                            else
+                                            {
+
+                                                0.ToString();
+                                            }
+                                        </td>
+                                        <td>@workOrder.AddedDateTime</td>
+                                        <td scope="col">@workOrder.Status</td>
+                                        <td><button class="btn btn-warning  rounded-pill btn-sm" @onclick="@(() => Modify(workOrder.WorkOrderId))">Update</button></td>
+                                        <td><button class="btn btn-danger  rounded-pill btn-sm" @onclick="@(() => Delete(workOrder))">Delete</button></td>
+                                    </tr>
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="col-sm">
+                    <table class="table p-0 m-0 table-striped table-hover ">
+
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Cutting Lenght</th>
+                                <th scope="col">Packet</th>
+                                <th scope="col">Cycle</th>
+                                <th scope="col">Speed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (selectedWorkOrder != null)
+                            {
+                                listId = 0;
+                                foreach (var cutting in selectedWorkOrder.CuttingList)
+                                {
+                                    listId++;
+                                    <tr>
+                                        <th scope="row">@listId</th>
+                                        <td>@cutting.CuttingLenght</td>
+                                        <td>@cutting.Packet</td>
+                                        <td>@cutting.Cycle</td>
+                                        <td>@cutting.Speed</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer text-muted pb-0">
+            <p> @workorders.Count() work order listed...</p>
+
+        </div>
+
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    WorkOrderModel[] workorders;
+    WorkOrderModel selectedWorkOrder;
+
+    int listId = 0;
+    int WorderlistId = 0;
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await LoadRecords();
+    //}
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadRecords();
+    }
+
+
+    async Task LoadRecords()
+    {
+        workorders = await _workOrderService.GetDeviceData(Id);
+    }
+
+    private async Task SelectWorkOrder(int workOrderId)
+    {
+        selectedWorkOrder = await _workOrderService.GetById(workOrderId);
+    }
+
+    private void Modify(int worderId)
+    {
+        navman.NavigateTo("/workorders/update/" + worderId);
+    }
+
+    private async Task Delete(WorkOrderModel workOrder)
+    {
+        await _workOrderService.Delete(workOrder);
+        workorders = await _workOrderService.GetDeviceData(Id);
+    }
+
+    private void NavigateWorkOrderAdd()
+    {
+        navman.NavigateTo("/workorders/add/" + Id);
+    }
+
+}

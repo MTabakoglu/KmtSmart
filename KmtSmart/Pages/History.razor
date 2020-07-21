@@ -1,0 +1,183 @@
+﻿@page "/history/{id:int}"
+@using System.Timers
+@inject ILiveDataService _liveDataService
+
+@inject HttpClient http
+@inject IJSRuntime js
+
+
+@if (liveDatas == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="card">
+        <div class="card-header clearfix">
+            <h3 class="ml-3  float-left ">History Live Datas</h3>
+            <div class="col-auto float-right">
+                <select class="custom-select float-right"  @onchange="SelectedQuantity">
+                    <option selected>Quantity Per Page</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-striped table-hover">
+                <thead class="text-center">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Cutting Type</th>
+
+                        <th scope="col">Cutting Set</th>
+                        <th scope="col">Cutting Real</th>
+
+                        <th scope="col">Active Cross Section</th>
+                        <th scope="col">Blade Speed</th>
+                        <th scope="col">Bow Servo Speed</th>
+                        <th scope="col">Body Position</th>
+
+                        <th scope="col">Main Engine Power</th>
+                        <th scope="col">Servo Power</th>
+
+                        <th scope="col">Front Vise Position</th>
+                        <th scope="col">Rear Vise Position</th>
+
+                        <th scope="col">Elapsed Time</th>
+                        <th scope="col">Remeaning Time</th>
+                        <th scope="col">Total Time</th>
+
+                        <th scope="col">Added Date</th>
+                    </tr>
+                </thead>
+                <tbody class="small text-center">
+                    @foreach (var livedata in liveDatas)
+                    {
+                        listId++;
+                        <tr>
+                                <th scope="row">@listId</th>
+                                <td>@livedata.CuttingType</td>
+
+                                <td>@livedata.CuttingSet</td>
+                                <td>@livedata.CuttingReal</td>
+
+                                <td>@livedata.ActiveCrossSection</td>
+                                <td>@livedata.BladeSpeed</td>
+                                <td>@livedata.ServoSpeed</td>
+                                <td>@livedata.BodyPosition</td>
+
+                                <td>@livedata.MainMotorPower</td>
+                                <td>@livedata.ServoPower</td>
+
+                                <td>@livedata.FrontPosition</td>
+                                <td>@livedata.RearPosition</td>
+
+                                <td>@livedata.ElapsedTime</td>
+                                <td>@livedata.RemainingTime</td>
+                                <td>@livedata.TotalTime</td>
+
+                                <td class="text-muted ">@livedata.TimeToAdd</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted pb-0 clearfix">
+            <div class="p-0 m-0 float-left">
+                <Pagination TotaPagesQuantity="totalPageQuantity" CurrentPage="currentPage" Radius="2"
+                            SelectedPage="SelectedPage"></Pagination>
+            </div>
+            <p class="float-left px-3 py-2 align-self-center">
+                @liveDatas.Count() of the @total entries are listed...
+            </p>
+        </div>
+    </div>
+}
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    int listId = 1;
+
+    List<ListLiveDataModel> liveDatas;
+
+    private int total;
+    private int quantityPerPage=10;
+    private int totalPageQuantity=10;
+    private int currentPage = 1;
+    private string nameFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecords();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadRecords();
+    }
+
+    private async Task SelectedPage(int page)
+    {
+        currentPage = page;
+        await LoadRecords(page,quantityPerPage);
+    }
+
+    private async Task SelectedQuantity(ChangeEventArgs e)
+    {
+        quantityPerPage = Convert.ToInt32( e.Value);
+
+        if (currentPage > total / quantityPerPage+1) currentPage = total/quantityPerPage+1;
+
+        await LoadRecords(currentPage, quantityPerPage);
+    }
+
+
+    private async Task Clear()
+    {
+        nameFilter = string.Empty;
+        currentPage = 1;
+        await LoadRecords();
+    }
+
+    async Task LoadRecords(int page = 1, int quantityPerPage = 10)
+    {
+        listId = 0;
+        var query = PathHelper.GetApiServerPath("livedata", string.Format("getdevicedata?deviceId={0}&page={1}&quantityPerPage={2}", Id, page, quantityPerPage));
+        var httpResponse = await http.GetAsync(query);
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            total = int.Parse(httpResponse.Headers.GetValues("count").FirstOrDefault());
+            totalPageQuantity = int.Parse(httpResponse.Headers.GetValues("pagesQuantity").FirstOrDefault());
+
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            liveDatas = JsonSerializer.Deserialize<List<ListLiveDataModel>>(responseString,
+            new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+    }
+
+
+
+    //private void ExportAsCSV()
+    //{
+    //    using (var memoryStream = new MemoryStream())
+    //    {
+    //        using (var writer = new StreamWriter(memoryStream))
+    //        {
+    //            using (var csv = new CsvHelper.CsvWriter(writer))
+    //            {
+    //                csv.WriteRecords(people);
+    //            }
+
+    //            var arr = memoryStream.ToArray();
+    //            js.SaveAs("people.csv", arr);
+    //        }
+    //    }
+    //}
+
+}
+
