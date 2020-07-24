@@ -15,26 +15,7 @@ namespace KmtSmart.Utilities
 {
     public class CustumAuthenticationStateProvider : AuthenticationStateProvider
     {
-        //LocalStorage localStorage;
-        //public CustumAuthenticationStateProvider(LocalStorage storage)
-        //{
-        //    localStorage = storage;
-        //}
-
-        //public override Task<AuthenticationState> GetAuthenticationStateAsync()
-        //{
-        //    var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-        //    var jwt = jwtSecurityTokenHandler.ReadJwtToken(localStorage.GetItem<string>("token").Result);
-
-        //    var identity = new ClaimsIdentity(jwt.Claims, "Custum authentication type");
-
-
-        //    var user = new ClaimsPrincipal(identity);
-
-        //    return Task.FromResult(new AuthenticationState(user));
-        //}
-
-
+       
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
 
@@ -51,13 +32,33 @@ namespace KmtSmart.Utilities
             {
                 return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
             }
+
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var jwt = jwtSecurityTokenHandler.ReadJwtToken(savedToken);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
+            var jwt = jwtSecurityTokenHandler.ReadJwtToken(savedToken);       
             var identity = new ClaimsIdentity(jwt.Claims, "custom");
-            var user = new ClaimsPrincipal(identity);
+            ClaimsPrincipal user;
+
+            var expiry = await _localStorage.GetItemAsync<DateTime>("expiry");
+            if (expiry != null)
+            {
+                if (expiry > DateTime.Now)
+                {
+                    user = new ClaimsPrincipal(identity);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
+                }
+                else
+                {
+                    user = new ClaimsPrincipal(new ClaimsIdentity());
+                    await _localStorage.RemoveItemAsync("token");
+                    _httpClient.DefaultRequestHeaders.Authorization = null;
+                }
+                
+            }else user = new ClaimsPrincipal(new ClaimsIdentity());
+
             return await Task.FromResult(new AuthenticationState(user));
         }
+      
+
 
         public void MarkUserAsAuthenticated(string email)
         {
@@ -73,40 +74,15 @@ namespace KmtSmart.Utilities
             NotifyAuthenticationStateChanged(authState);
         }
 
-        private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+        private static IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
         {
-            var claims = new List<Claim>();
             var payload = jwt.Split('.')[1];
             var jsonBytes = ParseBase64WithoutPadding(payload);
             var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-
-            keyValuePairs.TryGetValue(ClaimTypes.Role, out object roles);
-
-            if (roles != null)
-            {
-                if (roles.ToString().Trim().StartsWith("["))
-                {
-                    var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
-
-                    foreach (var parsedRole in parsedRoles)
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, parsedRole));
-                    }
-                }
-                else
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.ToString()));
-                }
-
-                keyValuePairs.Remove(ClaimTypes.Role);
-            }
-
-            claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
-
-            return claims;
+            return keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString()));
         }
 
-        private byte[] ParseBase64WithoutPadding(string base64)
+        private static byte[] ParseBase64WithoutPadding(string base64)
         {
             switch (base64.Length % 4)
             {

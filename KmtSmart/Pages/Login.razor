@@ -62,6 +62,8 @@
     protected async override Task OnInitializedAsync()
     {
         await _localStorage.RemoveItemAsync("token");
+        await _localStorage.RemoveItemAsync("expiry");
+        await _localStorage.RemoveItemAsync("UserId");
     }
 
     private async Task HandleLogin()

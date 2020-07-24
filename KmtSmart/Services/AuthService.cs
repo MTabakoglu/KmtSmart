@@ -1,14 +1,15 @@
-﻿
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using KmtSmart.Models;
 using KmtSmart.Utilities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace KmtSmart.Services
@@ -34,9 +35,11 @@ namespace KmtSmart.Services
             if (!string.IsNullOrEmpty(response.Token))
             {
                 await _localStorage.SetItemAsync<string>("token", response.Token);
+                await _localStorage.SetItemAsync<DateTime>("expiry", response.Expiration);
+                await _localStorage.SetItemAsync<int>("UserId", response.Identity);
                 IsLoggedIn = true;
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.Token);
-                ((CustumAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginModel.Email);
+                //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.Token);
+                //((CustumAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginModel.Email);
                 return await Task.FromResult(true);
             }
             else return await Task.FromResult(false);
@@ -45,6 +48,8 @@ namespace KmtSmart.Services
         public async Task Logout()
         {
             await _localStorage.RemoveItemAsync("token");
+            await _localStorage.RemoveItemAsync("expiry");
+            await _localStorage.RemoveItemAsync("UserId");
             IsLoggedIn = false;
             ((CustumAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
             _httpClient.DefaultRequestHeaders.Authorization = null;
@@ -64,6 +69,12 @@ namespace KmtSmart.Services
             return false;
         }
 
-      
+        public int GetUserId(string token)
+        {
+            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            var jwt = jwtSecurityTokenHandler.ReadJwtToken(token);
+            var identity = new ClaimsIdentity(jwt.Claims, "custom");
+            return int.Parse(identity.FindFirst(ClaimTypes.NameIdentifier).Value);
+        }
     }
 }

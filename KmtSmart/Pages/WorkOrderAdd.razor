@@ -111,7 +111,7 @@
         };
 
         await _workOrderService.Add(workorder);
-        Task.Delay(2000);
+        Task.Delay(3000);
         string link = string.Format("workorders/{0}", deviceId);
         navman.NavigateTo(link,true);
 

@@ -2,44 +2,60 @@
 @inject NavigationManager _navman
 @inject IAuthService _authService
 
-
-    <AuthorizeView>
-        <Authorized>
-            <div class="sidebar">
-                <NavMenu />
-            </div>
-            <div class="main">
-                <div class="top-row px-4 sticky-top" style="opacity:0.8">
-                    <div class="btn-group show">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <img src="img/user.jpg" class="rounded-circle" alt="" width="30px" height="30px">
-                            @context.User.Identity.Name
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">My Account</a>
-                            <a class="dropdown-item" href="#">Devices</a>
-                            <a class="dropdown-item" href="#">Help</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Logout</a>
-                        </div>
+<AuthorizeView>
+    <Authorized>
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+        <div class="main">
+            <div class="top-row px-4 sticky-top" style="opacity:0.8">
+                <div class="btn-group show">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <img src="img/user.jpg" class="rounded-circle" alt="" width="30px" height="30px">
+                        @context.User.Identity.Name
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">My Account</a>
+                        <a class="dropdown-item" href="#">Devices</a>
+                        <a class="dropdown-item" href="#">Help</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Logout</a>
                     </div>
                 </div>
-
-
-                <div class="content px-4">
-                    @Body
-                </div>
             </div>
-        </Authorized>
-        <NotAuthorized>
-            @Task.Run(LogOut)
-        </NotAuthorized>
-    </AuthorizeView>
-@code {   
+            <div class="content p-0 m-0">
+                @Body
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        @LogOut()
+    </NotAuthorized>
+</AuthorizeView>
+@code {
 
-    private async void LogOut()
+    protected override void OnInitialized()
+    {
+
+        base.OnInitialized();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task<string> LogOutAsync()
     {
         await _authService.Logout();
         _navman.NavigateTo("/", true);
+        return "";
+    }
+
+    private string LogOut()
+    {
+        _authService.Logout();
+        _navman.NavigateTo("/", true);
+        return "";
     }
 }

@@ -103,6 +103,11 @@
 
     private async Task Save()
     {
+        foreach (var cutting in workorder.CuttingList)
+        {
+            cutting.CuttingId = 0;
+        }
+
         await _workOrderService.Update(workorder);
         string link = string.Format("workorders/{0}", workorder.DeviceId);
         navman.NavigateTo(link);

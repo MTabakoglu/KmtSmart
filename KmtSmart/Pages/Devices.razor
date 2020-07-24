@@ -2,6 +2,7 @@
 @inject IDeviceService _deviceService
 @inject NavigationManager _navMan
 @inject AuthenticationStateProvider authProvider 
+@inject ILocalStorageService _localStorage
 
 @if (devices == null)
 {
@@ -101,10 +102,9 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-       
         listId = 1;
 
-        var UserId = 1;
+        var UserId = await _localStorage.GetItemAsync<int>("UserId");
         devices = await _deviceService.GetDevicesByUser(UserId);
     }
 
