@@ -1,6 +1,7 @@
 ﻿@page "/live2/{id:int}"
 @using System.Timers
 @inject ILiveDataService liveDataService
+@inject ICommandService commandService 
 @inject BlazorTimer Timer
 @implements IDisposable
 
@@ -10,7 +11,7 @@
         <div class="row mb-2">
             <div class="col text-center">
                 <button type="button" class="btn btn-success mb-2">
-                    @liveData.CuttingData.WorkOrderName<span class="badge badge-light">12</span>
+                    @liveData.CuttingData.WorkOrderName<span class="badge badge-light">@liveData.CuttingData.WorkorderCuttingId</span>
                     <span class="sr-only">unread messages</span>
                 </button>
                 <div style="width: 140px; height: 140px" class="card rounded-circle bg-primary text-center text-white m-auto">
@@ -18,18 +19,21 @@
                     <div class="center">
                         <img class="rounded-circle" src="img/user.jpg" style="width:50px; height:50px; margin-top: 0px">
                     </div>
-                    <h6 class="center mt-2">Shaft</h6>
+                    <h6 class="center mt-2">@liveData.CuttingData.Geometry</h6>
 
                 </div>
             </div>
 
         </div>
         <div class="row mb-2">
+            <span class="small text-right">@liveData.TimeToAdd</span>
+        </div>
+        <div class="row mb-2">
             <div class="col-md-3 p-1">
                 <div class="card p-2 bg-secondary" style="height: 120px">
-                    <button class="btn btn-danger pb-2"> STOP!! </button>
+                    <button class="btn btn-danger pb-2" @onclick="MachineStop"> STOP!! </button>
                     <br />
-                    <button class="btn btn-warning pb-2"> PAUSE! </button>
+                    <button class="btn btn-warning pb-2" @onclick="MachinePause"> PAUSE! </button>
                 </div>
             </div>
             <div class="col-md-9 p-1">
@@ -63,7 +67,7 @@
             <div class="col-md-3 text-center">
                 <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
                 <div style="display:inline;width:120px;height:120px;">
-                    <input type="text" class="knob" data-thickness="0.1" data-anglearc="250" data-angleoffset="-125" data-min="0" datuiea-max="300" value="@liveData.CuttingData.BladeSpeed" data-width="120" data-height="120" data-readonly="true" readonly="true" data-fgcolor="#606060" style="        width: 64px;
+                    <input type="text" class="knob" data-thickness="0.1" data-anglearc="250" data-angleoffset="-125" data-min="0" datuiea-max="300" value="@liveData.CuttingData.Cycle" data-width="120" data-height="120" data-readonly="true" readonly="true" data-fgcolor="#606060" style="        width: 64px;
         height: 40px;
         position: absolute;
         vertical-align: middle;
@@ -82,7 +86,7 @@
             </div>
             <div class="col-md-3 text-center">
                 <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
-                <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="400" value="@liveData.CuttingData.ServoSpeed" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
+                <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="400" value="@liveData.CuttingData.Speed" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
 
                 <div class="knob-label">Speed</div>
             </div>
@@ -96,8 +100,8 @@
                     </div>
                     <div class="card-body pt-2">
                         <p class="text-white text-center p-0 m-0">Center</p>
-                        <p class="text-white text-center p-0 m-0">-4.5</p>
-                        <input type="range" class="custom-range" id="customRange11" min="-5" max="5" value="-4.5">
+                        <p class="text-white text-center p-0 m-0">@liveData.CuttingData.CurveCut</p>
+                        <input type="range" class="custom-range" id="customRange11" min="-5" max="5" value="@liveData.CuttingData.CurveCut">
                     </div>
                     <span class="font-weight-bold text-primary ml-2 valueSpan2"></span>
                 </div>
@@ -180,6 +184,30 @@
                 return "text-success";
         }
         return "";
+    }
+
+    private async void MachineStop()
+    {
+        await commandService.Add(new CommandModel
+        {
+            DeviceId = Id,
+            Code = "STOP",
+            Message = "Emergency Stopped!",
+            Parameters = null
+
+        });
+    }
+
+    private async void MachinePause()
+    {
+        await commandService.Add(new CommandModel
+        {
+            DeviceId = Id,
+            Code = "PAUSE",
+            Message = "Hold after cutting!",
+            Parameters = null
+
+        });
     }
 
     public void Dispose()

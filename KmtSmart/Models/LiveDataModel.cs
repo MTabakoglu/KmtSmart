@@ -26,37 +26,37 @@ namespace KmtSmart.Models
         {
             Alarms = new List<string>();
         }
+
         [JsonPropertyName("ct")]
         public string CuttingType { get; set; }
 
+        [JsonPropertyName("mt")]
+        public string MaterialType { get; set; }
+        [JsonPropertyName("geo")]
+        public string Geometry { get; set; }
         [JsonPropertyName("wn")]
         public string WorkOrderName { get; set; }
         [JsonPropertyName("wi")]
         public int WorkorderCuttingId { get; set; }
 
-        [JsonPropertyName("cs")]
-        public float CuttingSet { get; set; }
-        [JsonPropertyName("cr")]
-        public float CuttingReal { get; set; }
-
-        [JsonPropertyName("mp")]
+        [JsonPropertyName("mpo")]
         public float MainMotorPower { get; set; }
-        [JsonPropertyName("sp")]
+        [JsonPropertyName("spo")]
         public float ServoPower { get; set; }
 
-        [JsonPropertyName("fp")]
-        public float FrontPosition { get; set; }
-        [JsonPropertyName("rp")]
-        public float RearPosition { get; set; }
 
-        [JsonPropertyName("acs")]
-        public float ActiveCrossSection { get; set; }
-        [JsonPropertyName("bs")]
-        public float BladeSpeed { get; set; }
-        [JsonPropertyName("ss")]
-        public float ServoSpeed { get; set; }
-        [JsonPropertyName("bp")]
-        public float BodyPosition { get; set; }
+        [JsonPropertyName("cm")]
+        public float CycleMultiplier { get; set; }
+        [JsonPropertyName("sm")]
+        public float SpeedMultiplier { get; set; }
+
+        [JsonPropertyName("cy")]
+        public float Cycle { get; set; }
+        [JsonPropertyName("sp")]
+        public float Speed { get; set; }
+
+        [JsonPropertyName("cc")]
+        public float CurveCut { get; set; }
 
         [JsonPropertyName("qa")]
         public int QuantityAll { get; set; }

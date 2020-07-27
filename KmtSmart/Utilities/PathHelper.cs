@@ -7,9 +7,9 @@ namespace KmtSmart.Utilities
 {
     public static class PathHelper
     {
-        //static string ServerUrl = "http://46.45.185.125:57160/api/";
+        static string ServerUrl = "http://46.45.185.125:57160/api/";
 
-        private static string ServerUrl = "https://localhost:44373/api/";
+        //private static string ServerUrl = "https://localhost:44373/api/";
         public static string GetApiServerPath(string ControllerName, string functionName)
         {
             return ServerUrl + ControllerName + "/" + functionName;

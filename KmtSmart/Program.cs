@@ -26,6 +26,7 @@ namespace KmtSmart
             builder.Services.AddSingleton<ILiveDataService, LiveDataService>();
             builder.Services.AddSingleton<IDeviceTypeService, DeviceTypeService>();
             builder.Services.AddSingleton<IWorkOrderService, WorkOrderService>();
+            builder.Services.AddSingleton<ICommandService, CommandService>();
             builder.Services.AddScoped<AuthenticationStateProvider, CustumAuthenticationStateProvider>();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddOptions();

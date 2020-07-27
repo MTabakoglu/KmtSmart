@@ -32,24 +32,25 @@ else
                         <th scope="col">#</th>
                         <th scope="col">Cutting Type</th>
 
-                        <th scope="col">Cutting Set</th>
-                        <th scope="col">Cutting Real</th>
+                        <th scope="col">Work Order</th>
+                        <th scope="col">Cutting Number</th>
 
-                        <th scope="col">Active Cross Section</th>
-                        <th scope="col">Blade Speed</th>
-                        <th scope="col">Bow Servo Speed</th>
-                        <th scope="col">Body Position</th>
+                        <th scope="col">Geometry</th>
+                        <th scope="col">Material Type</th>
 
                         <th scope="col">Main Engine Power</th>
                         <th scope="col">Servo Power</th>
 
-                        <th scope="col">Front Vise Position</th>
-                        <th scope="col">Rear Vise Position</th>
+                        <th scope="col">Cycle</th>
+                        <th scope="col">Speed</th>
+                        <th scope="col">Cycle Multiplier</th>
+                        <th scope="col">Speed Multiplier</th>
+
+                        <th scope="col">Curve Cut</th>
 
                         <th scope="col">Elapsed Time</th>
                         <th scope="col">Remeaning Time</th>
                         <th scope="col">Total Time</th>
-
                         <th scope="col">Added Date</th>
                     </tr>
                 </thead>
@@ -57,30 +58,31 @@ else
                     @foreach (var livedata in liveDatas)
                     {
                         listId++;
-                        <tr>
-                                <th scope="row">@listId</th>
-                                <td>@livedata.CuttingType</td>
+                    <tr>
+                        <th scope="row">@listId</th>
+                        <td>@livedata.CuttingType</td>
 
-                                <td>@livedata.CuttingSet</td>
-                                <td>@livedata.CuttingReal</td>
+                        <td>@livedata.WorkOrderName</td>
+                        <td>@livedata.WorkorderCuttingId</td>
 
-                                <td>@livedata.ActiveCrossSection</td>
-                                <td>@livedata.BladeSpeed</td>
-                                <td>@livedata.ServoSpeed</td>
-                                <td>@livedata.BodyPosition</td>
+                        <td>@livedata.Geometry</td>
+                        <td>@livedata.MaterialType</td>
+                        <td>@livedata.MainMotorPower</td>
+                        <td>@livedata.ServoPower</td>
 
-                                <td>@livedata.MainMotorPower</td>
-                                <td>@livedata.ServoPower</td>
+                        <td>@livedata.Cycle</td>
+                        <td>@livedata.CycleMultiplier</td>
+                        <td>@livedata.Speed</td>
+                        <td>@livedata.SpeedMultiplier</td>
 
-                                <td>@livedata.FrontPosition</td>
-                                <td>@livedata.RearPosition</td>
+                        <td>@livedata.CurveCut</td>
 
-                                <td>@livedata.ElapsedTime</td>
-                                <td>@livedata.RemainingTime</td>
-                                <td>@livedata.TotalTime</td>
+                        <td>@livedata.ElapsedTime</td>
+                        <td>@livedata.RemainingTime</td>
+                        <td>@livedata.TotalTime</td>
 
-                                <td class="text-muted ">@livedata.TimeToAdd</td>
-                        </tr>
+                        <td class="text-muted ">@livedata.TimeToAdd</td>
+                    </tr>
                     }
                 </tbody>
             </table>
