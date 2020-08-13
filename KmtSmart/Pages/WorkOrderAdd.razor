@@ -90,7 +90,13 @@
 
     private void AddRow()
     {
-        cuttings.Add(new Cutting());
+        cuttings.Add(new Cutting { 
+        CuttingLenght=10,
+        Cycle=100,
+        Speed=200,
+        TotalPiece=1,
+        Packet=1
+        });
     }
 
     private void RemoveRow(Cutting cutting)
@@ -112,9 +118,8 @@
 
         await _workOrderService.Add(workorder);
         Task.Delay(3000);
-        string link = string.Format("workorders/{0}", deviceId);
-        navman.NavigateTo(link,true);
-
+        string link = string.Format("/workorders/{0}", deviceId);
+        navman.NavigateTo(link);
     }
 }
 

@@ -79,22 +79,30 @@
 
 
 @code {
-    [Parameter]
-    public int worderid { get; set; }
+        [Parameter]
+        public int worderid { get; set; }
 
-    int ListId = 0;
+        int ListId = 0;
+        int deviceId;
+        WorkOrderModel workorder = new WorkOrderModel();
 
-    WorkOrderModel workorder = new WorkOrderModel();
+        protected override async Task OnInitializedAsync()
+        {
+            workorder = await _workOrderService.GetById(worderid);
+            deviceId = workorder.DeviceId;
+        }
 
-    protected override async Task OnInitializedAsync()
-    {
-        workorder = await _workOrderService.GetById(worderid);
-    }
-
-    private void AddRow()
-    {
-        workorder.CuttingList.Add(new Cutting());
-    }
+        private void AddRow()
+        { 
+        workorder.CuttingList.Add(new Cutting {
+        CuttingLenght=10,
+        Cycle=100,
+        Speed=200,
+        TotalPiece=1,
+        Packet=1,
+        WorkOrderId= worderid
+        });
+        }
 
     private void RemoveRow(Cutting cutting)
     {
@@ -108,8 +116,11 @@
             cutting.CuttingId = 0;
         }
 
+        workorder.Status = "Güncelleniyor...";
+
         await _workOrderService.Update(workorder);
-        string link = string.Format("workorders/{0}", workorder.DeviceId);
+        string link = string.Format("/workorders/{0}", deviceId);
+        Task.Delay(3000);
         navman.NavigateTo(link);
 
     }

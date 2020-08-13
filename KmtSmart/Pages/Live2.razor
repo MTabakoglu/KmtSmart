@@ -1,73 +1,75 @@
 ﻿@page "/live2/{id:int}"
 @using System.Timers
 @inject ILiveDataService liveDataService
-@inject ICommandService commandService 
+@inject ICommandService commandService
 @inject BlazorTimer Timer
 @implements IDisposable
 
 @if (liveData != null)
 {
-    <div class="content p-0 m-0">
-        <div class="row mb-2">
-            <div class="col text-center">
-                <button type="button" class="btn btn-success mb-2">
-                    @liveData.CuttingData.WorkOrderName<span class="badge badge-light">@liveData.CuttingData.WorkorderCuttingId</span>
-                    <span class="sr-only">unread messages</span>
-                </button>
-                <div style="width: 140px; height: 140px" class="card rounded-circle bg-primary text-center text-white m-auto">
-                    <h4 class="center mt-2">@liveData.CuttingData.CuttingType</h4>
-                    <div class="center">
-                        <img class="rounded-circle" src="img/user.jpg" style="width:50px; height:50px; margin-top: 0px">
-                    </div>
-                    <h6 class="center mt-2">@liveData.CuttingData.Geometry</h6>
+    if (liveData.CuttingData != null)
+    {
+        <div class="content p-0 m-0">
+            <div class="row mb-2">
+                <div class="col text-center">
+                    <button type="button" class="btn btn-success mb-2">
+                        @liveData.CuttingData.WorkOrderName<span class="badge badge-light">@liveData.CuttingData.WorkorderCuttingId</span>
+                        <span class="sr-only">unread messages</span>
+                    </button>
+                    <div style="width: 140px; height: 140px" class="card rounded-circle bg-primary text-center text-white m-auto">
+                        <h4 class="center mt-2">@liveData.CuttingData.CuttingType</h4>
+                        <div class="center">
+                            <img class="rounded-circle" src="img/user.jpg" style="width:50px; height:50px; margin-top: 0px">
+                        </div>
+                        <h6 class="center mt-2">@liveData.CuttingData.Geometry</h6>
 
-                </div>
-            </div>
-
-        </div>
-        <div class="row mb-2">
-            <span class="small text-right">@liveData.TimeToAdd</span>
-        </div>
-        <div class="row mb-2">
-            <div class="col-md-3 p-1">
-                <div class="card p-2 bg-secondary" style="height: 120px">
-                    <button class="btn btn-danger pb-2" @onclick="MachineStop"> STOP!! </button>
-                    <br />
-                    <button class="btn btn-warning pb-2" @onclick="MachinePause"> PAUSE! </button>
-                </div>
-            </div>
-            <div class="col-md-9 p-1">
-                <div class="card bg-warning p-3" style="height: 120px">
-                    <h6 class="mt-2 mb-0">Kalan Süre</h6>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-secondary" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@CompletionRate</div>
-                    </div>
-                    <h6 class="mt-2 mb-0">Toplam Kalan Süre</h6>
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-secondary px-2" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@CompletionRate</div>
                     </div>
                 </div>
+
             </div>
-        </div>
-        <div class="row clearfix">
-            <div class="col-md-3 text-center">
-                <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
-                <div style="display:inline;width:120px;height:120px;">
-                    <input type="text" class="knob" data-thickness="0.3" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="100" value="@liveData.CuttingData.MainMotorPower" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;">
+            <div class="row mb-2">
+                <span class="small text-right">@liveData.TimeToAdd</span>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 p-1">
+                    <div class="card p-2 bg-secondary" style="height: 120px">
+                        <button class="btn btn-danger pb-2" @onclick="MachineStop"> STOP!! </button>
+                        <br />
+                        <button class="btn btn-warning pb-2" @onclick="MachinePause"> PAUSE! </button>
+                    </div>
                 </div>
-
-                <div class="knob-label">Main Motor</div>
+                <div class="col-md-9 p-1">
+                    <div class="card bg-warning p-3" style="height: 120px">
+                        <h6 class="mt-2 mb-0">Kalan Süre</h6>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-secondary" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@CompletionRate</div>
+                        </div>
+                        <h6 class="mt-2 mb-0">Toplam Kalan Süre</h6>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-secondary px-2" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@CompletionRate</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3 text-center">
-                <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
-                <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.3" data-anglearc="250" data-angleoffset="-125" data-min="-100" data-max="100" value="@liveData.CuttingData.ServoPower" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
+            <div class="row clearfix">
+                <div class="col-md-3 text-center">
+                    <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
+                    <div style="display:inline;width:120px;height:120px;">
+                        <input type="text" class="knob" data-thickness="0.3" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="100" value="@liveData.CuttingData.MainMotorPower" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;">
+                    </div>
 
-                <div class="knob-label">Servo Motor</div>
-            </div>
-            <div class="col-md-3 text-center">
-                <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
-                <div style="display:inline;width:120px;height:120px;">
-                    <input type="text" class="knob" data-thickness="0.1" data-anglearc="250" data-angleoffset="-125" data-min="0" datuiea-max="300" value="@liveData.CuttingData.Cycle" data-width="120" data-height="120" data-readonly="true" readonly="true" data-fgcolor="#606060" style="        width: 64px;
+                    <div class="knob-label">Main Motor</div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
+                    <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.3" data-anglearc="250" data-angleoffset="-125" data-min="-100" data-max="100" value="@liveData.CuttingData.ServoPower" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
+
+                    <div class="knob-label">Servo Motor</div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
+                    <div style="display:inline;width:120px;height:120px;">
+                        <input type="text" class="knob" data-thickness="0.1" data-anglearc="250" data-angleoffset="-125" data-min="0" datuiea-max="300" value="@liveData.CuttingData.Cycle" data-width="120" data-height="120" data-readonly="true" readonly="true" data-fgcolor="#606060" style="        width: 64px;
         height: 40px;
         position: absolute;
         vertical-align: middle;
@@ -80,53 +82,64 @@
         color: rgb(0, 192, 239);
         padding: 0px;
         appearance: none;">
+                    </div>
+
+                    <div class="knob-label">Cycle</div>
                 </div>
+                <div class="col-md-3 text-center">
+                    <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
+                    <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="400" value="@liveData.CuttingData.Speed" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
 
-                <div class="knob-label">Cycle</div>
-            </div>
-            <div class="col-md-3 text-center">
-                <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
-                <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="400" value="@liveData.CuttingData.Speed" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
-
-                <div class="knob-label">Speed</div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col col-md-5 mx-auto p-1">
-                <div class="card bg-secondary d-flex justify-content-center pl-1">
-                    <div class="card-header p-0">
-                        <p class="mx-2 my-1 text-white text-center"> Eğri Kesim Ölçümü</p>
-                    </div>
-                    <div class="card-body pt-2">
-                        <p class="text-white text-center p-0 m-0">Center</p>
-                        <p class="text-white text-center p-0 m-0">@liveData.CuttingData.CurveCut</p>
-                        <input type="range" class="custom-range" id="customRange11" min="-5" max="5" value="@liveData.CuttingData.CurveCut">
-                    </div>
-                    <span class="font-weight-bold text-primary ml-2 valueSpan2"></span>
+                    <div class="knob-label">Speed</div>
                 </div>
             </div>
-        </div>
-        <div class="row p-2 mt-3">
-            <div class="col-md-9 p-0 pr-1 mx-auto">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Alarms </h5>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        @foreach (var alarm in liveData.CuttingData.Alarms)
-                        {
-                            <li class="list-group-item @SetALarmColor(alarm)">@alarm</li>
-                        }
-                    </ul>
-                    <div class="card-body">
-                        <p class="card-text">@liveData.CuttingData.Alarms.Count() alarm active. </p>
+
+            <div class="row">
+                <div class="col col-md-5 mx-auto p-1">
+                    <div class="card bg-secondary d-flex justify-content-center pl-1">
+                        <div class="card-header p-0">
+                            <p class="mx-2 my-1 text-white text-center"> Eğri Kesim Ölçümü</p>
+                        </div>
+                        <div class="card-body pt-2">
+                            <p class="text-white text-center p-0 m-0">Center</p>
+                            <p class="text-white text-center p-0 m-0">@liveData.CuttingData.CurveCut</p>
+                            <input type="range" class="custom-range" id="customRange11" min="-5" max="5" value="@liveData.CuttingData.CurveCut">
+                        </div>
+                        <span class="font-weight-bold text-primary ml-2 valueSpan2"></span>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="row p-2 mt-3">
+                <div class="col-md-9 p-0 pr-1 mx-auto">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Alarms </h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            @foreach (var alarm in liveData.CuttingData.Alarms)
+                            {
+                                <li class="list-group-item @SetALarmColor(alarm)">@alarm</li>
+                            }
+                        </ul>
+                        <div class="card-body">
+                            <p class="card-text">@liveData.CuttingData.Alarms.Count() alarm active. </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    </div>
+        </div>}
+    else
+    {
+        <div class="content p-0 m-0">
+
+            <div class="row mb-2">
+                <span class="small text-right">@liveData.TimeToAdd</span>
+
+                <span class="small text-right">Kesim Ekranı Açık Değil </span>
+            </div>
+        </div>
+    }
 }
 
 @code {
@@ -175,10 +188,10 @@
                 return "text-danger";
 
             case 'W':
-                return "text-warning";
+                return "text-primary";
 
             case 'I':
-                return "text-primary";
+                return "text-warning";
 
             case 'L':
                 return "text-success";

@@ -33,9 +33,12 @@ namespace KmtSmart.Utilities
                 return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
             }
 
-            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var jwt = jwtSecurityTokenHandler.ReadJwtToken(savedToken);       
-            var identity = new ClaimsIdentity(jwt.Claims, "custom");
+            //var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+
+            //var jwt = jwtSecurityTokenHandler.ReadJwtToken(savedToken);
+
+            var claims = ParseClaimsFromJwt(savedToken);
+            var identity = new ClaimsIdentity(claims, "custom");
             ClaimsPrincipal user;
 
             var expiry = await _localStorage.GetItemAsync<DateTime>("expiry");

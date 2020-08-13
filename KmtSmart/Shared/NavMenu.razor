@@ -1,7 +1,8 @@
 ﻿@inject IDeviceService  deviceService
 @inject IDeviceTypeService  deviceTypeService
+@inject ILocalStorageService localStorage
 
-<div class="top-row pl-4 navbar navbar-dark">
+<div class="navbar top-row pl-4 navbar-dark">
     <a class="navbar-brand" href="">KmtSmart</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -14,61 +15,63 @@
 else
 {
 
-<ul class="nav flex-column list-unstyled">
-    <li class="nav-item px-3 pb-0">
-        <NavLink  href="home">
-            <span class="oi oi-home" aria-hidden="true"></span> Home
-        </NavLink>
-    </li>
-    <li class="nav-item px-3 pb-0">
-        <NavLink href="devices">
-            <span class="oi oi-list-rich" aria-hidden="true"></span> Devices
-        </NavLink>
-    </li>
-    <div class="accordion" id="accordion1">
-        @foreach (var device in devices)
-        {
-            <li class="nav-item px-3">
-                <div id="@GetAccordionHref("header",device.Id)" class="clearfix">
-                    <NavLink class="nav-link float-left" href="@GetAccordionHref("#device",device.Id)">
-                        <span class="oi oi-fork" aria-hidden="true"></span> @device.Name
-                    </NavLink>
-                    <button class="btn btn-link float-right pr-2 text-white" type="button" data-toggle="collapse" data-target="@GetAccordionHref("#device",device.Id)" aria-expanded="true" aria-controls="@GetAccordionHref("device",device.Id)">
-                        <span class="oi oi-chevron-left" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <div id="@GetAccordionHref("device",device.Id)" class="collapse" aria-labelledby="@GetAccordionHref("header",device.Id)" data-parent="#accordion1">
-                    <ul class="list-unstyled">
-                        <li class="nav-item px-3">
-                            <NavLink class="nav-link" href="@GetLink("live",device.Id)">
-                                <span class="oi oi-dashboard" aria-hidden="true"></span> Live Wiew
-                            </NavLink>
-                        </li>
-                        <li class="nav-item px-3">
-                            <NavLink class="nav-link" href="@GetLink("workorders",device.Id)">
-                                <span class="oi oi-copywriting" aria-hidden="true"></span> Work Orders
-                            </NavLink>
-                        </li>
-                        <li class="nav-item px-3">
-                            <NavLink class="nav-link" href="@GetLink("history",device.Id)">
-                                <span class="oi fa fa-history" aria-hidden="true"></span> History
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
+    <div class="@NavMenuCssClass" >
+        <ul class="nav flex-column list-unstyled">
+            <li class="nav-item px-3 pb-0">
+                <NavLink href="home">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
             </li>
-        }
+            <li class="nav-item px-3 pb-0">
+                <NavLink href="devices">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Devices
+                </NavLink>
+            </li>
+            <div class="accordion" id="accordion1">
+                @foreach (var device in devices)
+                {
+                    <li class="nav-item px-3">
+                        <div id="@GetAccordionHref("header",device.Id)" class="clearfix">
+                            <NavLink class="nav-link float-left" href="@GetAccordionHref("#device",device.Id)">
+                                <span class="oi oi-fork" aria-hidden="true"></span> @device.Name
+                            </NavLink>
+                            <button class="btn btn-link float-right pr-2 text-white" type="button" data-toggle="collapse" data-target="@GetAccordionHref("#device",device.Id)" aria-expanded="true" aria-controls="@GetAccordionHref("device",device.Id)">
+                                <span class="oi oi-chevron-left" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div id="@GetAccordionHref("device",device.Id)" class="collapse" aria-labelledby="@GetAccordionHref("header",device.Id)" data-parent="#accordion1">
+                            <ul class="list-unstyled">
+                                <li class="nav-item px-3">
+                                    <NavLink class="nav-link" href="@GetLink("live2",device.Id)">
+                                        <span class="oi oi-dashboard" aria-hidden="true"></span> Live Wiew
+                                    </NavLink>
+                                </li>
+                                <li class="nav-item px-3">
+                                    <NavLink class="nav-link" href="@GetLink("workorders",device.Id)">
+                                        <span class="oi oi-copywriting" aria-hidden="true"></span> Work Orders
+                                    </NavLink>
+                                </li>
+                                <li class="nav-item px-3">
+                                    <NavLink class="nav-link" href="@GetLink("history",device.Id)">
+                                        <span class="oi fa fa-history" aria-hidden="true"></span> History
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                }
+            </div>
+            <li class="nav-item px-3 pb-0">
+                <NavLink href="Settings">
+                    <span class="oi oi-cog" aria-hidden="true"></span> Settings
+                </NavLink>
+            </li>
+        </ul>
     </div>
-    <li class="nav-item px-3 pb-0">
-        <NavLink href="Settings">
-            <span class="oi oi-cog" aria-hidden="true"></span> Settings
-        </NavLink>
-    </li>
-</ul>
 }
 @code {
     DeviceModel[] devices;
-    int UserId = 1;
+    int UserId;
 
     private bool collapseNavMenu = true;
 
@@ -81,6 +84,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        UserId = await localStorage.GetItemAsync<int>("UserId");
         devices = await deviceService.GetDevicesByUser(UserId);
     }
 
