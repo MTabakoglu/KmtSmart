@@ -88,15 +88,24 @@
 
     List<Cutting> cuttings = new List<Cutting>();
 
+    protected override bool ShouldRender()
+    {
+        var renderUI = false;
+
+        return renderUI;
+    }
+
+
     private void AddRow()
     {
-        cuttings.Add(new Cutting { 
-        CuttingLenght=10,
-        Cycle=100,
-        Speed=200,
-        TotalPiece=1,
-        Packet=1
+        cuttings.Add(new Cutting {
+            CuttingLenght=10,
+            Cycle=100,
+            Speed=200,
+            TotalPiece=1,
+            Packet=1
         });
+        StateHasChanged();
     }
 
     private void RemoveRow(Cutting cutting)

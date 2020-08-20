@@ -18,7 +18,7 @@ else
     <div class="@NavMenuCssClass" >
         <ul class="nav flex-column list-unstyled">
             <li class="nav-item px-3 pb-0">
-                <NavLink href="home">
+                <NavLink href="devices">
                     <span class="oi oi-home" aria-hidden="true"></span> Home
                 </NavLink>
             </li>
@@ -32,7 +32,7 @@ else
                 {
                     <li class="nav-item px-3">
                         <div id="@GetAccordionHref("header",device.Id)" class="clearfix">
-                            <NavLink class="nav-link float-left" href="@GetAccordionHref("#device",device.Id)">
+                            <NavLink class="nav-link float-left">
                                 <span class="oi oi-fork" aria-hidden="true"></span> @device.Name
                             </NavLink>
                             <button class="btn btn-link float-right pr-2 text-white" type="button" data-toggle="collapse" data-target="@GetAccordionHref("#device",device.Id)" aria-expanded="true" aria-controls="@GetAccordionHref("device",device.Id)">

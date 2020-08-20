@@ -21,7 +21,7 @@
                         <div class="center">
                             <img class="rounded-circle" src="img/user.jpg" style="width:50px; height:50px; margin-top: 0px">
                         </div>
-                        <h6 class="center mt-2">@liveData.CuttingData.Geometry</h6>
+                        <h6 class="center mt-2">@liveData.CuttingData.Geometry - @liveData.CuttingData.MaterialType</h6>
 
                     </div>
                 </div>
@@ -33,26 +33,74 @@
             <div class="row mb-2">
                 <div class="col-md-3 p-1">
                     <div class="card p-2 bg-secondary" style="height: 120px">
-                        <button class="btn btn-danger pb-2" @onclick="MachineStop"> STOP!! </button>
-                        <br />
-                        <button class="btn btn-warning pb-2" @onclick="MachinePause"> PAUSE! </button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#StoppedModal">
+                            STOP !!!
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="StoppedModal" tabindex="-1" role="dialog" aria-labelledby="StoppedModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger" id="StoppedModalLabel">Dikkat!</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="text-danger">Makinayı durdurmak istediğinize emin misiniz?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-danger" @onclick="MachineStop" data-dismiss="modal">Ok. Mackine Stopped.</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (liveData.CuttingData.CuttingType != "Manual")
+                        {
+                            <br />
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#PausedModal">
+                                PAUSE !
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="PausedModal" tabindex="-1" role="dialog" aria-labelledby="PausedModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-primary" id="PausedModalLabel">Dikkat!</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="text-primary">Makinayı Bekletme Moduna almak istediğinize emin misiniz?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-warning" @onclick="MachinePause" data-dismiss="modal">Ok. Mackine Paused.</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
                 <div class="col-md-9 p-1">
                     <div class="card bg-warning p-3" style="height: 120px">
                         <h6 class="mt-2 mb-0">Kalan Süre</h6>
                         <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-secondary" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@CompletionRate</div>
+                            <div class="progress-bar progress-bar-striped bg-secondary" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">% @CompletionRate</div>
                         </div>
-                        <h6 class="mt-2 mb-0">Toplam Kalan Süre</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-secondary px-2" role="progressbar" style="width: @CompletionRate%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">@CompletionRate</div>
-                        </div>
+                        <h6 class="mt-2">Toplam Kalan Süre <span class="badge badge-info px-3 mx-2"> @TimeSpan.FromSeconds(liveData.CuttingData.TotalTime).ToString()</span></h6>
+
                     </div>
                 </div>
             </div>
             <div class="row clearfix">
-                <div class="col-md-3 text-center">
+                <div class="col-md-2 text-center">
                     <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
                     <div style="display:inline;width:120px;height:120px;">
                         <input type="text" class="knob" data-thickness="0.3" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="100" value="@liveData.CuttingData.MainMotorPower" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;">
@@ -60,37 +108,39 @@
 
                     <div class="knob-label">Main Motor</div>
                 </div>
-                <div class="col-md-3 text-center">
+                <div class="col-md-2 text-center">
                     <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
                     <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.3" data-anglearc="250" data-angleoffset="-125" data-min="-100" data-max="100" value="@liveData.CuttingData.ServoPower" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
 
                     <div class="knob-label">Servo Motor</div>
                 </div>
-                <div class="col-md-3 text-center">
+                <div class="col-md-2 text-center">
                     <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
                     <div style="display:inline;width:120px;height:120px;">
-                        <input type="text" class="knob" data-thickness="0.1" data-anglearc="250" data-angleoffset="-125" data-min="0" datuiea-max="300" value="@liveData.CuttingData.Cycle" data-width="120" data-height="120" data-readonly="true" readonly="true" data-fgcolor="#606060" style="        width: 64px;
-        height: 40px;
-        position: absolute;
-        vertical-align: middle;
-        margin-top: 40px;
-        margin-left: -92px;
-        border: 0px;
-        background: none;
-        font: bold 24px Arial;
-        text-align: center;
-        color: rgb(0, 192, 239);
-        padding: 0px;
-        appearance: none;">
+                        <input type="text" class="knob" data-thickness="0.1" data-anglearc="250" data-angleoffset="-125" data-min="0" datuiea-max="300" value="@liveData.CuttingData.Cycle" data-width="120" data-height="120" data-readonly="true" readonly="true" data-fgcolor="#606060" style=" width: 64px;height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;">
                     </div>
-
                     <div class="knob-label">Cycle</div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-primary" @onclick="@(()=> UpDownCycleSpeed("Cycle","D",liveData.CuttingData.CuttingType))"><i class="fas fa-bold fa-2x fa-caret-left"></i> </button>
+                        <button type="button" class="btn btn-primary disabled">@Cycle()</button>
+                        <button type="button" class="btn btn-primary" @onclick="@(()=> UpDownCycleSpeed("Cycle","U",liveData.CuttingData.CuttingType))"><i class="fas fa-bold fa-2x fa-caret-right"></i></button>
+                    </div>
                 </div>
-                <div class="col-md-3 text-center">
+                <div class="col-md-2 text-center">
                     <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
                     <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="400" value="@liveData.CuttingData.Speed" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
-
                     <div class="knob-label">Speed</div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-primary" @onclick="@(()=> UpDownCycleSpeed("Speed","D",liveData.CuttingData.CuttingType))"><i class="fas fa-bold fa-2x fa-caret-left"></i> </button>
+                        <button type="button" class="btn btn-primary disabled">@Speed()</button>
+                        <button type="button" class="btn btn-primary" @onclick="@(()=> UpDownCycleSpeed("Speed","U",liveData.CuttingData.CuttingType))"><i class="fas fa-bold fa-2x fa-caret-right"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <canvas width="240" height="240" style="width: 120px; height: 120px;"></canvas>
+                    <div style="display:inline;width:120px;height:120px;"><input type="text" class="knob" data-thickness="0.2" data-anglearc="250" data-angleoffset="-125" data-min="0" data-max="@liveData.CuttingData.QuantityAll" value="@liveData.CuttingData.AmountCutting" data-width="120" data-height="120" data-fgcolor="#00c0ef" style="width: 64px; height: 40px; position: absolute; vertical-align: middle; margin-top: 40px; margin-left: -92px; border: 0px; background: none; font: bold 24px Arial; text-align: center; color: rgb(0, 192, 239); padding: 0px; appearance: none;"></div>
+                    <div class="knob-label">Amount Cutting</div>
+                    <div class="knob-label">@TotalPiece() </div>
                 </div>
             </div>
 
@@ -128,7 +178,8 @@
                 </div>
             </div>
 
-        </div>}
+        </div>
+    }
     else
     {
         <div class="content p-0 m-0">
@@ -171,13 +222,15 @@
     private async void TimerElapsedHandler()
     {
         liveData = await liveDataService.GetLastData(Id);
+        SetCompletionRate();
         StateHasChanged();
         Console.WriteLine("Timer Ticked.");
     }
 
     private void SetCompletionRate()
     {
-        if (liveData.CuttingData != null) if ((liveData.CuttingData.ElapsedTime + liveData.CuttingData.RemainingTime) == 0) CompletionRate = "0"; else CompletionRate = Convert.ToInt32(liveData.CuttingData.ElapsedTime * 100 / (liveData.CuttingData.ElapsedTime + liveData.CuttingData.RemainingTime)).ToString();
+        if (liveData.CuttingData != null) if ((liveData.CuttingData.ElapsedTime + liveData.CuttingData.RemainingTime) == 0) CompletionRate = "0";
+            else CompletionRate = Convert.ToInt32(liveData.CuttingData.ElapsedTime * 100 / (liveData.CuttingData.ElapsedTime + liveData.CuttingData.RemainingTime)).ToString();
     }
 
     private string SetALarmColor(string alarm)
@@ -220,6 +273,50 @@
             Message = "Hold after cutting!",
             Parameters = null
 
+        });
+    }
+
+    private string Cycle()
+    {
+        switch (liveData.CuttingData.CuttingType)
+        {
+            case "Smart":
+                return "%" + liveData.CuttingData.CycleMultiplier.ToString();
+            default:
+                return liveData.CuttingData.Cycle.ToString();
+        }
+    }
+
+    private string Speed()
+    {
+        switch (liveData.CuttingData.CuttingType)
+        {
+            case "Smart":
+                return "%" + liveData.CuttingData.SpeedMultiplier.ToString();
+            default:
+                return liveData.CuttingData.Speed.ToString();
+        }
+
+    }
+
+    private string TotalPiece()
+    {
+        if (liveData.CuttingData.CuttingType != "Manual") return "Total Piece:" + liveData.CuttingData.QuantityAll.ToString(); else return "";
+    }
+
+    private async void UpDownCycleSpeed(string property, string value, string type)
+    {
+        var parameters = new List<Parameters>();
+        parameters.Add(new Parameters { Key = "Property", Value = property });
+        parameters.Add(new Parameters { Key = "Function", Value = value });
+        parameters.Add(new Parameters { Key = "Type", Value = type });
+
+        await commandService.Add(new CommandModel
+        {
+            Code = "UPDOWN",
+            DeviceId = Id,
+            Message = "Speed Artır",
+            Parameters = parameters
         });
     }
 
