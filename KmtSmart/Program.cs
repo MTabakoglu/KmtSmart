@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
@@ -15,7 +14,6 @@ namespace KmtSmart
     {
         public static async Task Main(string[] args)
         {
-            CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture;
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
             builder.RootComponents.Add<App>("app");
